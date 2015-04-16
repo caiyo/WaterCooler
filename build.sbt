@@ -13,7 +13,8 @@ libraryDependencies ++= Seq(
 )     
 
 val appDependencies = Seq(
-  javaJdbc
+  javaJdbc,
+  javaJpa
 )
 
 play.Project.playJavaSettings

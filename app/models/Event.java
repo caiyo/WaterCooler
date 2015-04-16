@@ -12,20 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name="event")
-public class Event {
-    private long id;
-    private Date createDate = new Date();
+@AttributeOverride(name = "id", column = @Column(name = "event_id"))
+public class Event extends AbstractModel{
 
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    public long getId(){
-        return id;
-    }
-    public void setId(long id){
-        this.id=id;
-    }
-    public Date getCreateDate() {
-        return createDate;
-    }
 }

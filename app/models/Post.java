@@ -1,36 +1,38 @@
 package models;
 
-import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import play.db.jpa.JPA;
 
 @Entity
 @Table(name="post")
-public class Post {
-    private long id;
-    private User user;
-    private String content;
-    private Date createDate = new Date();
-
-    
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    public long getId(){
-        return id;
-    }
-    public void setId(long id){
-        this.id=id;
-    }
+@AttributeOverride(name = "id", column = @Column(name = "post_id"))
+public class Post extends AbstractModel {
     @ManyToOne
     @JoinColumn(name="user_id")
+    private User user;
+
+    @OneToMany(mappedBy="post", cascade=CascadeType.REMOVE)
+    private Set<Comment> comments = new HashSet<>();
+    
+    private String content;
+
+    public Post(){}
+    public Post(User user, String content){
+        this.user=user;
+        this.content=content;
+    }
+   
     public User getUser() {
         return user;
     }
@@ -43,8 +45,31 @@ public class Post {
     public void setContent(String content) {
         this.content = content;
     }
-    public Date getCreateDate() {
-        return createDate;
+    public Set<Comment> getComments() {
+        return comments;
+    }
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+/*
+ * STATIC METHODS
+ *
+ */
+    public static Post findPostById(long id){
+        return JPA.em().find(Post.class, id);
+    }
+    
+    public static Post createPost(Post post){
+        JPA.em().persist(post);
+        return post;
+    }
+    public static Post updatePost(Post updatedPost){
+        JPA.em().merge(updatedPost);
+        return updatedPost;
+    }
+    public static void deletePost(Post post){
+        JPA.em().remove(post);
     }
     
 }

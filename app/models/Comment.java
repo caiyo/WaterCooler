@@ -12,40 +12,35 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import play.db.jpa.JPA;
 
 @Entity
 @Table(name="comment")
-public class Comment {
-    private long id;
+@AttributeOverride(name = "id", column = @Column(name = "comment_id"))
+public class Comment extends AbstractModel {
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
     private User user;
    
+    @ManyToOne
+    @JoinColumn(name="post_id")
     private Post post;
     
     private String content;
     
-    private Date createDate = new Date();
 /*
  * Getters and setters
  * 
  */
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    public long getId(){
-        return id;
-    }
-    public void setId(long id){
-        this.id=id;
-    }
-    @ManyToOne
-    @JoinColumn(name="user_id")
+    
+    
     public User getUser() {
         return user;
     }
     public void setUser(User user) {
         this.user = user;
     }
-    @ManyToOne
-    @JoinColumn(name="post_id")
     public Post getPost() {
         return post;
     }
@@ -58,7 +53,28 @@ public class Comment {
     public void setContent(String content) {
         this.content = content;
     }
-    public Date getCreateDate() {
-        return createDate;
+    
+/*
+ * STATIC METHODS
+ */
+    public static Comment findCommentById(long id){
+        return JPA.em().find(Comment.class, id );
     }
+    
+    public static Comment createComment(Comment comment, Post post){
+        comment.setPost(post);
+        JPA.em().persist(comment);
+        return comment;
+    }
+    
+    public static Comment updateComment(Comment comment, String content){
+        comment.setContent(content);
+        JPA.em().merge(comment);
+        return comment;
+    }
+    
+    public static void deleteComment(Comment comment){
+        JPA.em().remove(comment);
+    }
+
 }
