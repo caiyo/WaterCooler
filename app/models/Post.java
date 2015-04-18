@@ -64,6 +64,8 @@ public class Post extends AbstractModel {
         JPA.em().persist(post);
         return post;
     }
+    //Not necessarily needed since dirty checking is enabled by default for hibernate
+    //created just in case
     public static Post updatePost(Post updatedPost){
         JPA.em().merge(updatedPost);
         return updatedPost;

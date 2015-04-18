@@ -29,6 +29,13 @@ public class Comment extends AbstractModel {
     
     private String content;
     
+    public Comment(){}
+    public Comment(User user, Post post, String content){
+        this.user=user;
+        this.post=post;
+        this.content=content;
+    }
+    
 /*
  * Getters and setters
  * 
@@ -61,12 +68,12 @@ public class Comment extends AbstractModel {
         return JPA.em().find(Comment.class, id );
     }
     
-    public static Comment createComment(Comment comment, Post post){
-        comment.setPost(post);
+    public static Comment createComment(Comment comment){
         JPA.em().persist(comment);
         return comment;
     }
-    
+    //Not necessarily needed since dirty checking is enabled by default for hibernate
+    //created just in case
     public static Comment updateComment(Comment comment, String content){
         comment.setContent(content);
         JPA.em().merge(comment);

@@ -76,6 +76,8 @@ public class User extends AbstractModel{
         return user;
     }
     
+    //Not necessarily needed since dirty checking is enabled by default for hibernate
+    //created just in case
     public static User updateUser(User updatedUser){
         JPA.em().merge(updatedUser);
         return updatedUser;

@@ -22,8 +22,15 @@ public class Community extends AbstractModel {
     @Column(name="community_name", unique=true)
     private String communityName;
     
+    //must be in the format of "xxx.yyy" eg: google.com or standford.edu
     @Column(name="email_domain", unique=true)
     private String emailDomain;
+    
+    public Community(){}
+    public Community(String communityName, String emailDomain){
+        this.communityName = communityName;
+        this.emailDomain=emailDomain;
+    }
 
 /*
  * Getters and Setters
@@ -53,7 +60,7 @@ public class Community extends AbstractModel {
         try{
             com=JPA.em()
                     .createQuery("from Community where lower(communityName)=?", Community.class)
-                    .setParameter(0, communityName.toLowerCase())
+                    .setParameter(1, communityName.toLowerCase())
                     .getSingleResult();
         }catch(NoResultException e){
             com=null;
@@ -66,7 +73,7 @@ public class Community extends AbstractModel {
         try{
             com=JPA.em()
                     .createQuery("from Community where lower(emailDomain)=?", Community.class)
-                    .setParameter(0, emailDomain.toLowerCase())
+                    .setParameter(1, emailDomain.toLowerCase())
                     .getSingleResult();
         }catch(NoResultException e){
             e.printStackTrace();
@@ -76,11 +83,17 @@ public class Community extends AbstractModel {
     }
     
     public static Community createCommunity(Community community){
-
-        JPA.em().persist(community); 
+        try{
+            JPA.em().persist(community);
+        }catch(Exception e){
+            e.printStackTrace();
+            community=null;
+        }
         return community;
     }
     
+    //Not necessarily needed since dirty checking is enabled by default for hibernate
+    //created just in case
     public static Community updateCommunity(Community updatedCommunity){
       JPA.em().merge(updatedCommunity);
       return updatedCommunity;

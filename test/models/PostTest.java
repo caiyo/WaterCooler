@@ -42,6 +42,16 @@ public class PostTest extends BaseTest {
         });
     }
     @Test
+    public void testFindPostByIdIsNull(){
+        JPA.withTransaction(new play.libs.F.Callback0() {
+            @Override
+            public void invoke() throws Throwable {
+                Post p = Post.findPostById(2);
+                assertNull(p);
+            }
+        });
+    }
+    @Test
     public void testUpdatePost(){
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
@@ -67,6 +77,9 @@ public class PostTest extends BaseTest {
                 Post.deletePost(p);
                 p=Post.findPostById(1);
                 assertNull(p);
+                
+                //TODO Check that all comments associated with post are also deleted
+
             }
         });
     }

@@ -89,6 +89,9 @@ public class UserTest extends BaseTest {
                 User user = User.findUserById(1);
                 User.deleteUser(user);
                 assertNull(User.findUserById(1));
+                
+                //TODO Check that all posts and comments associated with user are also deleted
+
             }
         });
     }
