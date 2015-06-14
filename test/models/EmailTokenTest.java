@@ -55,8 +55,8 @@ public class EmailTokenTest extends BaseTest{
                 EmailToken et = new EmailToken(u, "test@google.com", Community.findCommunityByEmail("google.com"));
                 EmailToken.createEmailToken(et);
                 
-                assertTrue(EmailToken.validateEmailToken(u, et));
-                assertTrue(EmailToken.validateEmailToken(u, EmailToken.findUserById(1)));
+                assertTrue(et.validateEmailToken(u));
+                assertTrue(EmailToken.findUserById(1).validateEmailToken(u));
             }
         });
         
