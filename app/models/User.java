@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import util.Utility;
 
 import play.db.jpa.JPA;
 
@@ -40,7 +41,6 @@ public class User extends AbstractModel {
         this.username=username;
     }
 
-    
     public User(String username,String password,
             String confirmPassword) {
         this.username = username;
@@ -54,27 +54,35 @@ public class User extends AbstractModel {
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
     public String getConfirmPassword() {
         return confirmPassword;
     }
+
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
+
     public String getSalt() {
         return salt;
     }
+
     public void setSalt(String salt) {
         this.salt = salt;
     }
+
     public boolean validateUserForCreation() {
         if (getPassword() == null || getPassword().length() < MINIMUM_PASSWORD_SIZE) {
             return false;
@@ -82,6 +90,18 @@ public class User extends AbstractModel {
             return false;
         }
         return true;
+    }
+
+    public boolean validateForLogin(String submittedPassword) {
+        String hash = Utility.hashString(submittedPassword, getSalt());
+        return hash.equalsIgnoreCase(getPassword());
+    }
+
+    public void createUserCredentials() {
+        if (getPassword() != null) {
+            setSalt(Utility.generateHexString(SALT_SIZE));
+            setPassword(Utility.hashString(getPassword(), getSalt()));
+        }
     }
     /*
  * STATIC METHODS
@@ -124,5 +144,5 @@ public class User extends AbstractModel {
     
     public static void deleteUser(User user) {
         JPA.em().remove(user);
-    } 
+    }
 }

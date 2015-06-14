@@ -2,6 +2,7 @@ package models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -26,13 +27,14 @@ public class UserTest extends BaseTest {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.createUser(new User("test"));
+                User u = User.createUser(new User("test"));
                 assertNotNull(u);        
 
             }
         }); 
         
     }
+
     @Test
     public void testUserNotCreated() {
         JPA.withTransaction(new play.libs.F.Callback0() {
@@ -44,6 +46,7 @@ public class UserTest extends BaseTest {
         }); 
         
     }
+
     @Test
     public void testFindUserById() {
         JPA.withTransaction(new play.libs.F.Callback0() {
@@ -55,6 +58,7 @@ public class UserTest extends BaseTest {
             }
         });
     }
+
     @Test
     public void testFindUserByUsername() {
         JPA.withTransaction(new play.libs.F.Callback0() {
@@ -67,6 +71,7 @@ public class UserTest extends BaseTest {
             }
         });
     }
+
     @Test
     public void testUserUpdate() {
         JPA.withTransaction(new play.libs.F.Callback0() {
@@ -80,6 +85,7 @@ public class UserTest extends BaseTest {
             }
         });
     }
+
     @Test
     public void testUserDelete() {
         JPA.withTransaction(new play.libs.F.Callback0() {
@@ -95,6 +101,7 @@ public class UserTest extends BaseTest {
             }
         });
     }
+
     @Test
     public void testUserConstructor() {
         User u = new User("testuser", "abc", "abc");
@@ -102,19 +109,33 @@ public class UserTest extends BaseTest {
         assertNotNull(u.getPassword());
         assertNotNull(u.getConfirmPassword());
     }
+
     @Test 
     public void testValidateUserShortPassword() {
         User u = new User("testuser", "abc", "abc");
         assertFalse(u.validateUserForCreation());
     }
+
     @Test 
     public void testValidateUserWrongConfirmPassword() {
         User u = new User("testuser", "password", "123456");
         assertFalse(u.validateUserForCreation());
     }
+
     @Test 
     public void testValidateUserNullConfirmPassword() {
         User u = new User("testuser", "password", null);
         assertFalse(u.validateUserForCreation());
+    }
+    
+    @Test 
+    public void testCreateUserCredentials() {
+        User u = new User("testuser", "password", "password");
+        String oldPassword = u.getPassword();
+        assertNull(u.getSalt());
+        u.createUserCredentials();
+        assertFalse(oldPassword.equals(u.getPassword()));
+        assertTrue(u.getPassword().length() == 64); //SHA-256 String length;
+        assertNotNull(u.getSalt());
     }
 }
