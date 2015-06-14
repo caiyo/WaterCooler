@@ -10,9 +10,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.db.jpa.JPA;
 
+/**
+ * @author kylewong
+ *
+ */
 @Entity
 @Table(name="user")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
@@ -23,12 +30,30 @@ public class User extends AbstractModel{
     
     private String name;
     
+    @JsonIgnore
+    private String password;
+    
+    @Transient
+    private String confirmPassword;
+    
+    @JsonIgnore
+    private String salt;
+    
     public User(){}
     public User(String username, String name){
         this.username=username;
         this.name=name;
     }
 
+    
+    public User(String username, String name, String password,
+            String confirmPassword) {
+        this.username = username;
+        this.name = name;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+    }
+    
 /*
  * GETTERS AND SETTESR
  */
@@ -44,7 +69,25 @@ public class User extends AbstractModel{
     public void setName(String name) {
         this.name = name;
     }
-/*
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+    public String getSalt() {
+        return salt;
+    }
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+    /*
  * STATIC METHODS
  */
     public static User findUserById(long id){
