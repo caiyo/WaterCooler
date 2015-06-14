@@ -14,7 +14,7 @@ public class CommentTest extends BaseTest{
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u = User.createUser(new User("caiyo", "Kyle"));     
+                User u = User.createUser(new User("caiyo"));     
                 Post.createPost(new Post(u, "this is post 1"));
             }
         });

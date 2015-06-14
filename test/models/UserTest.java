@@ -1,6 +1,9 @@
 package models;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -13,17 +16,17 @@ public class UserTest extends BaseTest {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User.createUser(new User("caiyo", "Kyle"));
+                User.createUser(new User("caiyo", "", ""));
             }
         });     
     }
     
     @Test
-    public void testUserCreation(){
+    public void testUserCreation() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.createUser(new User("test", "Kyle"));
+                User u =User.createUser(new User("test"));
                 assertNotNull(u);        
 
             }
@@ -31,34 +34,33 @@ public class UserTest extends BaseTest {
         
     }
     @Test
-    public void testUserNotCreated(){
+    public void testUserNotCreated() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.createUser(new User("caiyo", "Kyle"));
+                User u = User.createUser(new User("caiyo"));
                 assertNull(u);        
-
             }
         }); 
         
     }
     @Test
-    public void testFindUserById(){
+    public void testFindUserById() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.findUserById(1);
+                User u = User.findUserById(1);
                 assertNotNull(u);       
 
             }
         });
     }
     @Test
-    public void testFindUserByUsername(){
+    public void testFindUserByUsername() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.findUserByUsername("caiyo");
+                User u = User.findUserByUsername("caiyo");
                 assertNotNull(u);
                 assertEquals(u.getUsername(), "caiyo");
 
@@ -66,22 +68,20 @@ public class UserTest extends BaseTest {
         });
     }
     @Test
-    public void testUserUpdate(){
+    public void testUserUpdate() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
-                User u =User.findUserById(1);
-                u.setName("Shaun");
+                User u = User.findUserById(1);
                 User.updateUser(u);
                 
                 User updated = User.findUserById(1);
                 assertNotNull(updated);
-                assertEquals(updated.getName(), "Shaun");
             }
         });
     }
     @Test
-    public void testUserDelete(){
+    public void testUserDelete() {
         JPA.withTransaction(new play.libs.F.Callback0() {
             @Override
             public void invoke() throws Throwable {
@@ -94,5 +94,27 @@ public class UserTest extends BaseTest {
 
             }
         });
+    }
+    @Test
+    public void testUserConstructor() {
+        User u = new User("testuser", "abc", "abc");
+        assertNotNull(u.getUsername());
+        assertNotNull(u.getPassword());
+        assertNotNull(u.getConfirmPassword());
+    }
+    @Test 
+    public void testValidateUserShortPassword() {
+        User u = new User("testuser", "abc", "abc");
+        assertFalse(u.validateUserForCreation());
+    }
+    @Test 
+    public void testValidateUserWrongConfirmPassword() {
+        User u = new User("testuser", "password", "123456");
+        assertFalse(u.validateUserForCreation());
+    }
+    @Test 
+    public void testValidateUserNullConfirmPassword() {
+        User u = new User("testuser", "password", null);
+        assertFalse(u.validateUserForCreation());
     }
 }
