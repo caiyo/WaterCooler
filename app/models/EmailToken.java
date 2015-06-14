@@ -81,6 +81,11 @@ public class EmailToken extends AbstractModel{
         this.validated = validated;
     }
     
+    public boolean validateEmailToken(User loggedInUser){
+        if (getUser() == loggedInUser)
+            return true;
+        return false;
+    }
 /*
  * STATIC METHODS 
  */
@@ -114,10 +119,6 @@ public class EmailToken extends AbstractModel{
         }
         return emailToken;
     }
-    public static boolean validateEmailToken(User loggedInUser, EmailToken emailToken){
-        if (emailToken.getUser() == loggedInUser)
-            return true;
-        return false;
-    }
+
     
 }
