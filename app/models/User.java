@@ -1,20 +1,16 @@
 package models;
 
-import java.util.Date;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import util.Utility;
 
 import play.db.jpa.JPA;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author kylewong
@@ -23,12 +19,13 @@ import play.db.jpa.JPA;
 @Entity
 @Table(name="user")
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-public class User extends AbstractModel{
+public class User extends AbstractModel {
+
+    private static final int SALT_SIZE = 32;
+    private static final int MINIMUM_PASSWORD_SIZE = 6;
 
     @Column(unique=true)
     private String username;
-    
-    private String name;
     
     @JsonIgnore
     private String password;
@@ -40,16 +37,13 @@ public class User extends AbstractModel{
     private String salt;
     
     public User(){}
-    public User(String username, String name){
+    public User(String username) {
         this.username=username;
-        this.name=name;
     }
 
-    
-    public User(String username, String name, String password,
+    public User(String username,String password,
             String confirmPassword) {
         this.username = username;
-        this.name = name;
         this.password = password;
         this.confirmPassword = confirmPassword;
     }
@@ -60,41 +54,63 @@ public class User extends AbstractModel{
     public String getUsername() {
         return username;
     }
+
     public void setUsername(String username) {
         this.username = username;
     }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
     public String getConfirmPassword() {
         return confirmPassword;
     }
+
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
+
     public String getSalt() {
         return salt;
     }
+
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public boolean validateUserForCreation() {
+        if (getPassword() == null || getPassword().length() < MINIMUM_PASSWORD_SIZE) {
+            return false;
+        } else if (getConfirmPassword() == null || !getPassword().equals(getConfirmPassword())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean validateForLogin(String submittedPassword) {
+        String hash = Utility.hashString(submittedPassword, getSalt());
+        return hash.equalsIgnoreCase(getPassword());
+    }
+
+    public void createUserCredentials() {
+        if (getPassword() != null) {
+            setSalt(Utility.generateHexString(SALT_SIZE));
+            setPassword(Utility.hashString(getPassword(), getSalt()));
+        }
     }
     /*
  * STATIC METHODS
  */
-    public static User findUserById(long id){
+    public static User findUserById(long id) {
         return JPA.em().find(User.class, id);
     }
     
-    public static User findUserByUsername(String username){
+    public static User findUserByUsername(String username) {
         User u;
         try{
             u = JPA.em().
@@ -107,8 +123,8 @@ public class User extends AbstractModel{
         }
         return u;
     }
-    
-    public static User createUser(User user){
+
+    public static User createUser(User user) {
         try{
             JPA.em().persist(user);
         }catch(Exception e){
@@ -121,15 +137,12 @@ public class User extends AbstractModel{
     
     //Not necessarily needed since dirty checking is enabled by default for hibernate
     //created just in case
-    public static User updateUser(User updatedUser){
+    public static User updateUser(User updatedUser) {
         JPA.em().merge(updatedUser);
         return updatedUser;
     }
     
-    public static void deleteUser(User user){
+    public static void deleteUser(User user) {
         JPA.em().remove(user);
     }
-    
-    
-    
 }
