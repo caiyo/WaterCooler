@@ -13,6 +13,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import play.db.jpa.JPA;
+
 @Entity
 @Table(name="user_email")
 @AttributeOverride(name = "id", column = @Column(name = "user_email_id"))
@@ -28,6 +30,12 @@ public class UserEmail extends AbstractModel{
     
     @Column(name="email_address", unique=true)
     private String emailAddress;
+    
+    public UserEmail(User user, Community comunity, String emailAddress) {
+        this.user = user;
+        this.comunity = comunity;
+        this.emailAddress = emailAddress;
+    } 
 
 /*
  * GETTERS AND SETTERS
@@ -35,6 +43,7 @@ public class UserEmail extends AbstractModel{
  */
     
     
+   
     public User getUser() {
         return user;
     }
@@ -54,5 +63,18 @@ public class UserEmail extends AbstractModel{
         this.emailAddress = emailAddress;
     }
 
+/*
+ * STATIC METHODS
+ */
+    public static UserEmail createUserEmail(UserEmail userEmail){
+        try{
+            JPA.em().persist(userEmail);
+        }catch(Exception e){
+            e.printStackTrace();
+            userEmail=null;
+        }
+        return userEmail;
+    }
     
-}
+    
+}   

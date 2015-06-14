@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
+import play.Play;
+
 public class Utility {
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
     private static final Random random = new SecureRandom();
@@ -41,5 +43,14 @@ public class Utility {
         byte salt [] = new byte[size];
         random.nextBytes(salt);
         return bytesToHex(salt);
+    }
+    
+    public static String getBaseURL(){
+        String env = Play.application().configuration().getString("deploy_env");
+        if (env == null || env.equals("local"))
+            return "127.0.0.1:9000";
+        else
+            //TODO add production URL;
+            return "";
     }
 }
